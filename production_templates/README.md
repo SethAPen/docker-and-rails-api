@@ -205,3 +205,5 @@
   ```
 
 - You should now have all you need to pull you images and deploy them into a production environment with https certs from [Let's Encrypt](https://letsencrypt.org/).
+
+  If something isn't working for you or you found an error, please raise an issue on the github repository.
