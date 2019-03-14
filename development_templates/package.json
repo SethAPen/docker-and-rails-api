@@ -1,0 +1,7 @@
+{
+  "scripts": {
+    "deploy": "docker build -t ${YOUR_USER_NAME}/${YOUR_PROJECT_NAME} . && docker login && docker push ${YOUR_USER_NAME}/${YOUR_PROJECT_NAME}",
+    "up": "docker-compose up",
+    "down": "docker-compose down"
+  }
+}

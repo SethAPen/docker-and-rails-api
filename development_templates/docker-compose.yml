@@ -1,0 +1,26 @@
+version: "3"
+services:
+  api:
+    build: .
+    command: bash -c "RAILS_ENV=${RAILS_ENV} rails db:create db:migrate db:seed && RAILS_ENV=${RAILS_ENV} rails s -p ${PORT} -b '0.0.0.0'"
+    ports:
+      - ${PORT}:${PORT}
+    depends_on:
+      - postgres
+    tty: true
+    stdin_open: true
+    environment:
+      - PORT=${PORT}
+      - DATABASE_URL=${DATABASE_URL}
+      - RAILS_ENV=${RAILS_ENV}
+  postgres:
+    image: postgres
+    environment:
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+    volumes:
+      - pgdb:/var/lib/postgresql/data
+
+#prettier-ignore
+volumes:
+  pgdb:
