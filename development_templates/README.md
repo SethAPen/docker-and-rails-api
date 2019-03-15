@@ -1,5 +1,7 @@
 ## Setting up a Rails API development environment
 
+#### A list of known gotchas and issues is included at the bottom of this README.
+
 First we will get all the prerequisites:
 
 - Make sure you have a copy of either: Windows 10 Pro, Windows 10 Enterprise or Windows 10 Education
@@ -51,6 +53,14 @@ Copy all the files in this folder excluding the README of course.
   DATABASE_URL=${YOUR_DB_URL}
   POSTGRES_USER=${YOUR_USER}
   POSTGRES_PASSWORD=${YOUR_PASSWORD}
+  ```
+
+  ### NOTE: The database_url should look something like this if you use postgres as your database.
+
+  For "example_host_name" that name should be the same as your docker-compose database service name.
+
+  ```
+  postgres://example_user:example_password@example_host_name:5432/example_base_database_name?encoding=utf8&pool=5&timeout=5000
   ```
 
 - package.json
@@ -151,6 +161,55 @@ Copy all the files in this folder excluding the README of course.
     pgdb:
   ```
 
+  Now we should add a gem to our rails project to support our .env file.
+  Add this to your Gemfile development and testing group:
+
+  ```ruby
+  gem 'dotenv-rails'
+  ```
+
+  Your Gemfile development and testing group should look like this:
+
+  ```ruby
+  group :development, :test do
+    # Call 'byebug' anywhere in the code to stop execution and get a debugger console
+    gem 'byebug', platforms: [:mri, :mingw, :x64_mingw]
+    gem 'dotenv-rails'
+  end
+  ```
+
+  We also need to configure the rails database.yml file to support our environment variables.
+
+  ```
+  development:
+  url: <%= ENV['DATABASE_URL'].gsub('?', '_development?') %>
+
+  test:
+    url: <%= ENV['DATABASE_URL'].gsub('?', '_test?') %>
+
+  production:
+    url: <%= ENV['DATABASE_URL'].gsub('?', '_production?') %>
+
+  ```
+
   That should be all you need to start developing a Rails app using Docker. See the production_templates folder for information on deploying to production.
 
   If something isn't working for you or you found an error, please raise an issue on the github repository.
+
+### Known Gotchas
+
+- When adding new gems and running the bundle command will bundle the gems using a newer version of bundler then the Docker image allows. If you see an error like "you must use bundler 2 or greater with this lockfile" when runnig a docker-compose up --build or docker build command you need to change a line in your Gemfile.lock
+
+  - If you see something like the below line of code you need to change this line:
+
+    ```
+    BUNDLED WITH
+      2.0.1
+    ```
+
+    Change that line to this:
+
+    ```
+    BUNDLED WITH
+      1.17.1
+    ```
