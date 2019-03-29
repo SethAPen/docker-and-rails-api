@@ -13,3 +13,4 @@ Example:
 ```json
 "deploy": "docker build -t ${USER_NAME}/${PROJECT_NAME} . && docker login && docker push ${USER_NAME}/${PROJECT_NAME}"
 ```
+Note: -t is a flag that allows you to tag your image build, that tag will be the name used when pushing to Docker Hub.
