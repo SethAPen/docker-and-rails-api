@@ -89,6 +89,7 @@ Copy all the files in this folder excluding the README of course.
   - This file defines our Docker Image that the containers will be based on.
 
   ```yml
+  # base image to create our new image from.
   FROM ruby:2.5.3
 
   # change as per your local environment.
@@ -133,6 +134,7 @@ Copy all the files in this folder excluding the README of course.
   - This file manages all our containers and defines the configuration for each one. It creates our volumes for our postgres database and defines commands to be run on container startup. For example database migrations or creating the database.
 
   ```yml
+  # The docker compose version. You shouldn't need to change this.
   version: "3"
   services:
     api:
