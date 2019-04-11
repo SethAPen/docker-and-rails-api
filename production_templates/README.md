@@ -41,9 +41,6 @@
     # Stop any running containers.
     docker-compose down
 
-    # Remove Traefik acme file.
-    rm acme.json
-
     # Create Traefik file and create the proxy network.
     touch acme.json
     chmod 600 acme.json
