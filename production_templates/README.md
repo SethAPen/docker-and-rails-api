@@ -2,6 +2,8 @@
 
 ### This folder contains deployment scripts and Docker configuration files for deploying a Ruby on Rails app in API mode with a React frontend to a Ubuntu 18.04 linux server.
 
+### NOTE: This guide expects that you have configured a domain for your server and that a sub domain exists for API specific requests.
+
 - Technologies/3rd party software list
 
   - [Docker](https://www.docker.com/)
@@ -22,7 +24,7 @@
   usermod ${YOUR_USERNAME} -G sudo,docker
   ```
 
-### **NOTE**: The above step is not required, but is suggested for security reasons.
+### NOTE: The above step is not required, but is suggested for security reasons.
 
 - Create a folder structure for your deployed server configuration files and deployment scripts.
 
@@ -83,9 +85,12 @@
   ```bash
   debug = false
 
+  # Define logging level
   logLevel = "INFO"
+  # Define entry points.
   defaultEntryPoints = ["https", "http"]
 
+  # Configure the entry points.
   [entryPoints]
     [entryPoints.http]
     address = ":80"
@@ -114,28 +119,38 @@
   ```
 
 - The last script we need to add is the [docker-compose.yml](https://docs.docker.com/compose/compose-file/) file.
+- ### NOTE: This config expects you to have a domain and a sub domain for your rails API. If you do not do this the routing for Rails may not work properly.
 - docker-compose.yml
 
   ```yml
   version: "3"
+  # Define default networks.
   networks:
     default:
       external:
         name: proxy
+  # Define services/containers for our app.
   services:
     traefik:
+      # The image to uses as a base.
       image: traefik:alpine
+      # If there is an error try to restart.
       restart: always
+      # Define the allowed ports.
       ports:
         - 80:80
         - 443:443
+      # Define persistant storage for traefik configs.
       volumes:
         - /var/run/docker.sock:/var/run/docker.sock
         - ./traefik.toml:/traefik.toml
         - ./acme.json:/acme.json
     client:
+      # Our client image we built in development.
       image: [your_image_name_here]
+      # Restart on failure.
       restart: always
+      # Add traefik specific configuration.
       labels:
         - "traefik.backend=client"
         - "traefik.docker.network=proxy"
@@ -145,41 +160,53 @@
         - "traefik.default.protocol=http"
         - "traefik.frontend.priority=10"
     api:
+      # Restart on error.
       restart: always
+      # Command to be executed on container start.
       command: bash -c " RAILS_ENV=${RAILS_ENV}rails db:create db:migrate db:seed && RAILS_ENV=${RAILS_ENV} rails s -p ${PORT} -b '0.0.0.0'"
+      # Our api image we built in development. This will have the same name as our Docker Hub repository.
       image: [your_image_name_here]
+      # Add traefik specific configuration.
       labels:
         - "traefik.backend=api"
         - "traefik.docker.network=proxy"
         - "traefik.enable=true"
         - "traefik.port=${PORT}"
-        - "traefik.frontend.rule=PathPrefixStrip:/api/"
+        - "traefik.frontend.rule=PathPrefixStrip:Host: [host_sub_domain_name_here]"
         - "traefik.default.protocol=http"
         - "traefik.frontend.priority=20"
       ports:
         - ${PORT}:${PORT}
+      # Dependant service/container
       depends_on:
         - postgres
+      # Environment variables for the image.
       environment:
         DATABASE_URL: ${DATABASE_URL}
         RAILS_ENV: ${RAILS_ENV}
         PORT: ${PORT}
     postgres:
+      # Base image for postgres in production.
       image: postgres:10-alpine
+      # Restart on error.
       restart: always
+      # Define persistant storage volume.
       volumes:
         - pgdb:/var/lib/postgresql/data
+      # Add traefik specific configuration.
       labels:
         - "traefik.postgres=postgres"
         - "traefik.docker.network=proxy"
         - "traefik.enable=true"
         - "traefik.port=5432"
         - "traefik.default.protocol=http"
+      # Environment variables for the image.
       environment:
         POSTGRES_USER: ${POSTGRES_USER}
         POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
 
   #prettier-ignore
+  # Our custom volumes.
   volumes:
     pgdb:
   ```
