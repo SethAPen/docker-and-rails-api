@@ -1,8 +1,11 @@
 debug = false
 
+# Define logging level
 logLevel = "INFO"
+# Define entry points.
 defaultEntryPoints = ["https", "http"]
 
+# Configure the entry points.
 [entryPoints]
   [entryPoints.http]
   address = ":80"
