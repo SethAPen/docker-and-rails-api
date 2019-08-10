@@ -32,7 +32,7 @@
 
 - Configure your deployment scripts as per your environment
 
-  - The script below creates the docker proxy network and a configuration file for [Traefix](https://traefik.io/).
+  - The script below creates the docker proxy network and a configuration file for [Traefik](https://traefik.io/).
   - It also pulls your Docker image from [Docker Hub](https://hub.docker.com) and starts the container in daemon mode and outputs the logs to the console.
 
   - restart.sh <-- this name is up to you.
