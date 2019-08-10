@@ -151,7 +151,7 @@
       labels:
         - "traefik.backend=client"
         - "traefik.docker.network=proxy"
-        - "traefik.frontend.rule=Host:[host_domain_name_here]
+        - "traefik.frontend.rule=Host:[host_domain_name_here]"
         - "traefik.enable=true"
         - "traefik.port=80"
         - "traefik.default.protocol=http"
